@@ -13,6 +13,7 @@ const Header = () => {
     { href: "/planos", label: "Planos" },
     { href: "/sobre", label: "Sobre" },
     { href: "/contato", label: "Contato" },
+    { href: "/conveniados", label: "Clínicas Conveniadas" },
   ];
 
   const isActive = (path: string) => location.pathname === path;
@@ -27,8 +28,8 @@ const Header = () => {
               <CreditCard className="w-5 h-5 text-primary-foreground" />
             </div>
             <div className="flex flex-col">
-              <span className="text-lg font-bold text-foreground">Radioclim</span>
-              <span className="text-xs text-primary font-medium -mt-1">Card</span>
+              <span className="text-lg font-bold text-foreground">Radioclim Saúde</span>
+              <span className="text-xs text-primary font-medium -mt-1"> Medical Card</span>
             </div>
           </Link>
 

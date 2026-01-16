@@ -1,36 +1,82 @@
-import { Toaster } from "@/components/ui/toaster";
-import { Toaster as Sonner } from "@/components/ui/sonner";
-import { TooltipProvider } from "@/components/ui/tooltip";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { HelmetProvider } from "react-helmet-async";
-import Index from "./pages/Index";
-import Login from "./pages/Login";
-import Planos from "./pages/Planos";
-import Dashboard from "./pages/Dashboard";
-import NotFound from "./pages/NotFound";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 
-const queryClient = new QueryClient();
+import Index from "@/pages/Index";
+import Login from "@/pages/Login";
+import Planos from "@/pages/Planos";
+import Contato from "@/pages/Contato";
+import Sobre from "@/pages/Sobre";
+import Conveniados from "@/pages/Conveniados";
+import Checkout from "@/pages/Checkout";
+import CheckoutPendente from "@/pages/CheckoutPendente";
+import NotFound from "@/pages/NotFound";
 
-const App = () => (
-  <HelmetProvider>
-    <QueryClientProvider client={queryClient}>
-      <TooltipProvider>
-        <Toaster />
-        <Sonner />
-        <BrowserRouter>
-          <Routes>
-            <Route path="/" element={<Index />} />
-            <Route path="/login" element={<Login />} />
-            <Route path="/planos" element={<Planos />} />
-            <Route path="/dashboard" element={<Dashboard />} />
-            {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </BrowserRouter>
-      </TooltipProvider>
-    </QueryClientProvider>
-  </HelmetProvider>
-);
+import AppLayout from "@/pages/AppLayout";
+import MeuCard from "@/pages/app/MeuCard";
+import Agendamentos from "@/pages/app/Agendamentos";
+import Exames from "@/pages/app/Exames";
+import Dependentes from "@/pages/app/Dependentes";
+import Notificacoes from "@/pages/app/Notificacoes";
+import Servicos from "@/pages/app/Servicos"; // NOVO
+import Perfil from "@/pages/app/Perfil";     // NOVO
+import Configuracoes from "@/pages/app/Configuracoes";
+import { ProtectedRoute } from "@/components/ProtectedRoute";
+
+function App() {
+  return (
+    <BrowserRouter>
+      <Routes>
+        {/* 🌐 Landing pública */}
+        <Route path="/" element={<Index />} />
+
+        {/* 🔐 Auth */}
+        <Route path="/login" element={<Login />} />
+
+        {/* 📄 Páginas públicas */}
+        <Route path="/sobre" element={<Sobre />} />
+        <Route path="/contato" element={<Contato />} />
+        <Route path="/conveniados" element={<Conveniados />} />
+
+        {/* 💳 Checkout (público por enquanto) */}
+        <Route path="/checkout" element={<Checkout />} />
+        <Route path="/checkout/pendente" element={<CheckoutPendente />} />
+
+        {/* 💼 Planos (se quiser pode deixar público, mas mantive protegido como estava) */}
+        <Route
+          path="/planos"
+          element={
+            <ProtectedRoute>
+              <Planos />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* 🔒 Área do Cliente (rotas aninhadas) */}
+        <Route
+          path="/app"
+          element={
+            <ProtectedRoute>
+              <AppLayout />
+            </ProtectedRoute>
+          }
+        >
+          <Route index element={<MeuCard />} />
+          <Route path="agendamentos" element={<Agendamentos />} />
+          <Route path="exames" element={<Exames />} />
+          <Route path="dependentes" element={<Dependentes />} />
+          <Route path="notificacoes" element={<Notificacoes />} />
+          <Route path="servicos" element={<Servicos />} />
+          <Route path="perfil" element={<Perfil />} />
+          <Route path="configuracoes" element={<Configuracoes />} />
+        </Route>
+
+        {/* 🔁 Compat: se alguém cair na rota antiga (opcional) */}
+        <Route path="/dashboard" element={<Navigate to="/app" replace />} />
+
+        {/* ❌ 404 */}
+        <Route path="*" element={<NotFound />} />
+      </Routes>
+    </BrowserRouter>
+  );
+}
 
 export default App;
