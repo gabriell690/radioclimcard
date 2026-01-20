@@ -12,6 +12,10 @@ import NotFound from "@/pages/NotFound";
 
 import AppLayout from "@/pages/AppLayout";
 import MeuCard from "@/pages/app/MeuCard";
+import AppHome from "@/pages/app/AppHome";
+import FinanceiroAdmin from "@/pages/app/FinanceiroAdmin";
+import AdminClinicas from "@/pages/app/admin/AdminClinicas";
+import PedidosAdmin from "@/pages/app/PedidosAdmin";
 import Agendamentos from "@/pages/app/Agendamentos";
 import Exames from "@/pages/app/Exames";
 import Dependentes from "@/pages/app/Dependentes";
@@ -59,7 +63,14 @@ function App() {
             </ProtectedRoute>
           }
         >
-          <Route index element={<MeuCard />} />
+          <Route
+  path="/app/admin/clinicas"
+  element={<AdminClinicas />}
+/>
+
+          <Route index element={<AppHome />} />
+          <Route path="pedidos" element={<PedidosAdmin />} />
+          <Route path="financeiro" element={<FinanceiroAdmin />} />
           <Route path="agendamentos" element={<Agendamentos />} />
           <Route path="exames" element={<Exames />} />
           <Route path="dependentes" element={<Dependentes />} />
@@ -71,6 +82,7 @@ function App() {
 
         {/* 🔁 Compat: se alguém cair na rota antiga (opcional) */}
         <Route path="/dashboard" element={<Navigate to="/app" replace />} />
+        
 
         {/* ❌ 404 */}
         <Route path="*" element={<NotFound />} />

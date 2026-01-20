@@ -82,9 +82,12 @@ const Footer = () => {
         </div>
 
         <div className="border-t border-primary-foreground/10 mt-12 pt-8 text-center">
-          <p className="text-sm text-primary-foreground/50">
-            © {new Date().getFullYear()} Radioclim Card. Todos os direitos reservados.
-          </p>
+          <p className="text-xs text-muted-foreground">
+  © {new Date().getFullYear()} Radioclim Card. Todos os direitos reservados.
+  <br />
+  Sistema desenvolvido sob licença.
+</p>
+
         </div>
       </div>
     </footer>

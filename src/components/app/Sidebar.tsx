@@ -1,5 +1,9 @@
 import { NavLink, useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
+import type { Role } from "@/lib/useRole";
+import { Building2 } from "lucide-react";
+
+
 import {
   CreditCard,
   Calendar,
@@ -8,18 +12,42 @@ import {
   Bell,
   Stethoscope,
   LogOut,
+  LayoutDashboard,
+  Settings,
+  Wallet,
 } from "lucide-react";
 
-const items = [
+type SidebarItem = {
+  to: string;
+  label: string;
+  icon: React.ComponentType<{ className?: string }>;
+  end?: boolean;
+};
+
+type SidebarProps = {
+  role: Role; // "client" | "admin"
+};
+
+const clientItems: SidebarItem[] = [
   { to: "/app", label: "Meu Card", icon: CreditCard, end: true },
   { to: "/app/agendamentos", label: "Agendamentos", icon: Calendar },
   { to: "/app/exames", label: "Exames", icon: FileText },
-  { to: "/app/servicos", label: "Serviços", icon: Stethoscope }, // NOVO
+  { to: "/app/servicos", label: "Serviços", icon: Stethoscope },
   { to: "/app/dependentes", label: "Dependentes", icon: Users },
   { to: "/app/notificacoes", label: "Notificações", icon: Bell },
 ];
 
-export default function Sidebar() {
+const adminItems: SidebarItem[] = [
+  { to: "/app", label: "Dashboard", icon: LayoutDashboard, end: true },
+  { to: "/app/pedidos", label: "Pedidos", icon: FileText },
+  { to: "/app/financeiro", label: "Financeiro", icon: Wallet },
+  { to: "/app/admin/clinicas", label: "Clínicas", icon: Building2 }, // ✅ AQUI
+  { to: "/app/notificacoes", label: "Notificações", icon: Bell },
+  { to: "/app/perfil", label: "Perfil", icon: Users },
+  { to: "/app/configuracoes", label: "Configurações", icon: Settings },
+];
+
+export default function Sidebar({ role }: SidebarProps) {
   const navigate = useNavigate();
 
   // Mock por enquanto (depois vem do Supabase/AuthContext)
@@ -30,6 +58,9 @@ export default function Sidebar() {
     .slice(0, 2)
     .map((p) => p[0]?.toUpperCase())
     .join("");
+
+  const items = role === "admin" ? adminItems : clientItems;
+  
 
   function handleLogout() {
     // TODO: integrar com supabase.auth.signOut()
@@ -53,9 +84,7 @@ export default function Sidebar() {
 
             <div className="min-w-0 text-left">
               <p className="text-sm font-semibold truncate">{userName}</p>
-              <p className="text-xs text-muted-foreground truncate">
-                Ver perfil
-              </p>
+              <p className="text-xs text-muted-foreground truncate">Ver perfil</p>
             </div>
           </div>
 
@@ -65,6 +94,7 @@ export default function Sidebar() {
 
       {/* Menu */}
       <nav className="p-4 space-y-2 flex-1">
+        
         {items.map(({ to, label, icon: Icon, end }) => (
           <NavLink
             key={to}
