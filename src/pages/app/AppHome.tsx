@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
 
 import MeuCard from "@/pages/app/MeuCard";
-import AdminDashboard from "@/pages/app/Admin/AdminDashboard";
+import AdminDashboard from "@/pages/app/admin/AdminDashboard";
 
 type Role = "client" | "admin";
 
@@ -20,7 +20,6 @@ export default function AppHome() {
         return;
       }
 
-      // Busca o role na sua tabela "perfis"
       const { data, error } = await supabase
         .from("perfis")
         .select("role")
