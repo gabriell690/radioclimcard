@@ -7,7 +7,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Phone, Mail, MapPin, Send, MessageCircle, Instagram } from "lucide-react";
 import { useMemo, useState } from "react";
 
-const WHATSAPP_PHONE_E164 = "558333511234"; // Ex: 55 + DDD + número (sem + e sem espaços)
+const WHATSAPP_PHONE_E164 = " 5583987593850"; // Ex: 55 + DDD + número (sem + e sem espaços)
 const INSTAGRAM_URL = "https://www.instagram.com/radioclimcard"; // troque pelo seu
 const EMAIL_CONTATO = "contato@radioclimcard.com.br";
 const TELEFONE_EXIBICAO = "(83) 98759-3850";

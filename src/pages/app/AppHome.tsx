@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
 
 import MeuCard from "@/pages/app/MeuCard";
-import AdminDashboard from "@/pages/app/AdminDashboard";
+import AdminDashboard from "@/pages/app/Admin/AdminDashboard";
 
 type Role = "client" | "admin";
 

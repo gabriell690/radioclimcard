@@ -4,6 +4,7 @@ import { useSearchParams } from "react-router-dom";
 export default function ValidateCard() {
   const [params] = useSearchParams();
   const token = params.get("token");
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [result, setResult] = useState<any>(null);
 
   useEffect(() => {

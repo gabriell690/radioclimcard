@@ -38,9 +38,9 @@ const clientItems: SidebarItem[] = [
 ];
 
 const adminItems: SidebarItem[] = [
-  { to: "/app", label: "Dashboard", icon: LayoutDashboard, end: true },
-  { to: "/app/pedidos", label: "Pedidos", icon: FileText },
-  { to: "/app/financeiro", label: "Financeiro", icon: Wallet },
+  { to: "/app/admin", label: "Dashboard", icon: LayoutDashboard, end: true },
+  { to: "/app/admin/pedidos", label: "Pedidos", icon: FileText },
+  { to: "/app/admin/financeiro", label: "Financeiro", icon: Wallet },
   { to: "/app/admin/clinicas", label: "Clínicas", icon: Building2 }, // ✅ AQUI
   { to: "/app/notificacoes", label: "Notificações", icon: Bell },
   { to: "/app/perfil", label: "Perfil", icon: Users },

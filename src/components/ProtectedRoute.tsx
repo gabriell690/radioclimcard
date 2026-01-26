@@ -1,31 +1,95 @@
+import { Navigate, useLocation } from "react-router-dom";
 import { useEffect, useState } from "react";
-import { Navigate } from "react-router-dom";
+import { useAuth } from "@/lib/auth";
 import { supabase } from "@/lib/supabase";
 
-export const ProtectedRoute = ({ children }: { children: JSX.Element }) => {
-  const [loading, setLoading] = useState(true);
-  const [session, setSession] = useState<any>(null);
+export function ProtectedRoute({ children }: { children: JSX.Element }) {
+  const { user, loading: authLoading, role } = useAuth();
+  const location = useLocation();
+
+  const [checkingOrder, setCheckingOrder] = useState(true);
+  const [isPending, setIsPending] = useState(false);
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data }) => {
-      setSession(data.session);
-      setLoading(false);
-    });
+    let alive = true;
 
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
-      setSession(session);
-    });
+    // sempre que algo relevante mudar, volta para "checando"
+    setCheckingOrder(true);
 
-    return () => subscription.unsubscribe();
-  }, []);
+    // watchdog: se algo travar, não fica eterno
+    const watchdog = setTimeout(() => {
+      if (!alive) return;
+      console.warn("[ProtectedRoute] watchdog acionado — liberando tela.");
+      setIsPending(false);
+      setCheckingOrder(false);
+    }, 8000);
 
-  if (loading) return null;
+    async function check() {
+      try {
+        // Se auth ainda está carregando, aguarda a próxima render (não prende pra sempre por causa do watchdog)
+        if (authLoading) return;
 
-  if (!session) {
-    return <Navigate to="/login" replace />;
+        // não logado
+        if (!user) {
+          if (alive) setCheckingOrder(false);
+          return;
+        }
+
+        // admin não checa pendência
+        if (role === "admin") {
+          if (alive) {
+            setIsPending(false);
+            setCheckingOrder(false);
+          }
+          return;
+        }
+
+        // client: checa último pedido
+        const { data, error } = await supabase
+          .from("pedidos")
+          .select("status")
+          .eq("user_id", user.id)
+          .order("created_at", { ascending: false })
+          .limit(1)
+          .maybeSingle();
+
+        if (error) {
+          console.error("Erro ao checar pedido:", error);
+          if (alive) setIsPending(false);
+        } else {
+          const st = String(data?.status ?? "");
+          if (alive) setIsPending(st === "pendente" || st === "aguardando_pagamento");
+        }
+      } finally {
+        if (alive) setCheckingOrder(false);
+        clearTimeout(watchdog);
+      }
+    }
+
+    check();
+
+    return () => {
+      alive = false;
+      clearTimeout(watchdog);
+    };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user?.id, role, authLoading]);
+
+  if (authLoading || checkingOrder) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <p className="text-muted-foreground">Carregando...</p>
+      </div>
+    );
+  }
+
+  if (!user) {
+    return <Navigate to="/login" replace state={{ from: location }} />;
+  }
+
+  if (role !== "admin" && isPending) {
+    return <Navigate to="/checkout/pendente" replace />;
   }
 
   return children;
-};
+}

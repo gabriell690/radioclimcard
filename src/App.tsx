@@ -11,19 +11,45 @@ import CheckoutPendente from "@/pages/CheckoutPendente";
 import NotFound from "@/pages/NotFound";
 
 import AppLayout from "@/pages/AppLayout";
-import MeuCard from "@/pages/app/MeuCard";
+
+// CLIENTE
 import AppHome from "@/pages/app/AppHome";
-import FinanceiroAdmin from "@/pages/app/FinanceiroAdmin";
-import AdminClinicas from "@/pages/app/admin/AdminClinicas";
-import PedidosAdmin from "@/pages/app/PedidosAdmin";
+import MeuCard from "@/pages/app/MeuCard";
 import Agendamentos from "@/pages/app/Agendamentos";
 import Exames from "@/pages/app/Exames";
 import Dependentes from "@/pages/app/Dependentes";
 import Notificacoes from "@/pages/app/Notificacoes";
-import Servicos from "@/pages/app/Servicos"; // NOVO
-import Perfil from "@/pages/app/Perfil";     // NOVO
+import Servicos from "@/pages/app/Servicos";
+import Perfil from "@/pages/app/Perfil";
 import Configuracoes from "@/pages/app/Configuracoes";
+
+// ADMIN (componentes que você já tem)
+// ADMIN
+import AdminDashboard from "@/pages/app/admin/AdminDashboard";
+import AdminClinicas from "@/pages/app/admin/AdminClinicas";
+import PedidosAdmin from "@/pages/app/admin/PedidosAdmin";
+import FinanceiroAdmin from "@/pages/app/admin/FinanceiroAdmin";
+
 import { ProtectedRoute } from "@/components/ProtectedRoute";
+import { AdminRoute } from "@/components/AdminRoute";
+import { useAuth } from "@/lib/auth";
+
+/**
+ * Redireciona automaticamente /app para:
+ * - /app/admin (se role=admin)
+ * - /app/home (cliente)
+ */
+function AppIndexRedirect() {
+  const { role, loading } = useAuth();
+
+  if (loading) return null;
+
+  if (role === "admin") {
+    return <Navigate to="/app/admin" replace />;
+  }
+
+  return <Navigate to="/app/home" replace />;
+}
 
 function App() {
   return (
@@ -40,11 +66,11 @@ function App() {
         <Route path="/contato" element={<Contato />} />
         <Route path="/conveniados" element={<Conveniados />} />
 
-        {/* 💳 Checkout (público por enquanto) */}
+        {/* 💳 Checkout */}
         <Route path="/checkout" element={<Checkout />} />
         <Route path="/checkout/pendente" element={<CheckoutPendente />} />
 
-        {/* 💼 Planos (se quiser pode deixar público, mas mantive protegido como estava) */}
+        {/* 💼 Planos (exige login) */}
         <Route
           path="/planos"
           element={
@@ -54,7 +80,7 @@ function App() {
           }
         />
 
-        {/* 🔒 Área do Cliente (rotas aninhadas) */}
+        {/* 🔒 Área logada (cliente + admin) */}
         <Route
           path="/app"
           element={
@@ -63,14 +89,12 @@ function App() {
             </ProtectedRoute>
           }
         >
-          <Route
-  path="/app/admin/clinicas"
-  element={<AdminClinicas />}
-/>
+          {/* ✅ INDEX: manda admin para /app/admin e cliente para /app/home */}
+          <Route index element={<AppIndexRedirect />} />
 
-          <Route index element={<AppHome />} />
-          <Route path="pedidos" element={<PedidosAdmin />} />
-          <Route path="financeiro" element={<FinanceiroAdmin />} />
+          {/* ===================== CLIENTE ===================== */}
+          <Route path="home" element={<AppHome />} />
+          <Route path="meu-card" element={<MeuCard />} />
           <Route path="agendamentos" element={<Agendamentos />} />
           <Route path="exames" element={<Exames />} />
           <Route path="dependentes" element={<Dependentes />} />
@@ -78,11 +102,47 @@ function App() {
           <Route path="servicos" element={<Servicos />} />
           <Route path="perfil" element={<Perfil />} />
           <Route path="configuracoes" element={<Configuracoes />} />
+
+          {/* ===================== ADMIN ===================== */}
+          <Route
+            path="admin"
+            element={
+              <AdminRoute>
+                <AdminDashboard />
+              </AdminRoute>
+            }
+          />
+          <Route
+            path="admin/pedidos"
+            element={
+              <AdminRoute>
+                <PedidosAdmin />
+              </AdminRoute>
+            }
+          />
+          <Route
+            path="admin/financeiro"
+            element={
+              <AdminRoute>
+                <FinanceiroAdmin />
+              </AdminRoute>
+            }
+          />
+          <Route
+            path="admin/clinicas"
+            element={
+              <AdminRoute>
+                <AdminClinicas />
+              </AdminRoute>
+            }
+          />
+
+          {/* fallback interno do /app */}
+          <Route path="*" element={<Navigate to="/app" replace />} />
         </Route>
 
-        {/* 🔁 Compat: se alguém cair na rota antiga (opcional) */}
+        {/* 🔁 Compat: rota antiga */}
         <Route path="/dashboard" element={<Navigate to="/app" replace />} />
-        
 
         {/* ❌ 404 */}
         <Route path="*" element={<NotFound />} />
